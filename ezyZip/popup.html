@@ -1,0 +1,527 @@
+<html>
+<head>
+    <script src="common.js"></script>
+    <script src="popup.js"></script>
+    <script src="popupEditor.js"></script>
+
+    <script src="libs/purify/purify.js"></script>
+    <script src="libs/invertColor/invertColor.js"></script>
+    <script src="libs/jscolor/jscolor.js"></script>
+
+    <link rel="stylesheet" href="application.css" type="text/css">
+    <link rel="stylesheet" href="/libs/font-awesome/css/all.css">
+</head>
+<body>
+<div class="header" id="header">
+    <span class="title"><span id="litTitle"></span> <span id="offDesc"></span></span>
+    <span id="showDonate" class="secondaryLink" style="color:white; margin-left: 10px">Help & Donate!</span>
+    <a id="settingsLink" ><i class="fa fa-cog" aria-hidden="true"></i></a>
+    <div class="onoffswitch">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+        <label class="onoffswitch-label" for="myonoffswitch">
+            <div class="onoffswitch-inner"></div>
+            <div class="onoffswitch-switch"></div>
+        </label>
+    </div>
+</div>
+
+
+<div>
+    <div id="menu">
+        <div id="byline" style="text-align:center;">The extension highlights all below words on the page</div>
+
+        <div id="intro" class="intro" style="display:none;"><h2 id="popup_nowords">There are no word lists defined</h2>
+
+            <p>
+                <span id="popup_create1">Create a word list with words to have </span>
+                <span id="popup_title" style="color:#7F0EC9;">Highlight This!</span>
+                <span id="popup_create2">detect and highlight them on web pages while browsing.</span>
+            </p>
+        </div>
+
+        <div class="addMenuLink" style="text-align:center;" ><span id="addGroupLink" class="addGroupLink">+<!--span id="popup_addnewlist">Add a new word list</span--></span></div>
+        <div id="wordlistmenu" >
+            <span  id="collapseAll" class="expandButton">Collapse all</span>
+            <div style="text-align:right; margin-right:5px;">
+                <input id="filterwords" placeholder="Filter">
+                <i id="filtersubmit" class="fa fa-search"></i>
+            </div>
+        </div>
+    </div>
+    <div id="wordDisplay">
+
+        <div id="wordData" style=" margin-top:5px;"></div>
+    </div>
+
+    <div id="onPage" style="display:none;">
+        <div style="margin-top: 10px;"><a id="toConfig" class="secondaryLink" style="font-weight:bold;">< Go to configure words</a></div>
+        <h2 id="foundWords">We have found words on this page.</h2>
+
+        <div style="text-align:center;">
+            <table id="wordsfound" style="margin: 0 auto;"></table>
+            <div>
+                <a id="dontshowwords" class="secondaryLink"><i class="far fa-check-square" style="margin-right: 5px;"></i><span id="dontShowWordsLabel">Stop showing the words found on the page</span></a>
+            </div>
+            <p class="wordsFoundTip">
+                <span id="popup_tip1">Tip: Use </span>
+                <a style="text-decoration:underline;" id="browseHighlight">
+                    <span id="OSKey">Control</span>
+                    <span id="popup_tip2">+Shift+Space</span></a>
+                <span id="popup_tip3">to browse through words on the page</span>
+            </p></div>
+
+    </div>
+    <div id="newGroupType" style="display:none;">
+        <form id="createGroupForm"  style="margin-top: 20px;"></form>
+            <h2 id="titleCreateNewList">Create new list</h2>
+            <h3 id="newGroupTitleStorage" style="margin-bottom: 20px;">Do you want to sync this list between your browsers?</h3>
+            <div id="newGroupDetailStorage" class="inline-help">
+                A synchronized list is available in all your browsers when logged in to your browser, but it supports less words due to storage limitations.
+            </div>
+            <div>
+                <input type="radio" id="storageLocal" name="storage" value="local"><label for="storageLocal" id="storageLocalLabel">No, do not synchronize this list</label><br>
+                <input type="radio" id="storageSync" name="storage" value="sync"><label for="storageSync" id="storageSyncLabel">Yes, synchronize this list</label><br>
+            </div>
+            <div id="newGroupTypePart2">
+                <h3 id="newGroupTitle" style="margin-bottom: 20px;">Where do you want to manage the words?</h3>
+                <div id="newGroupDetail" class="inline-help">
+                    You can manage your list of words in Highlight This, or you can manage them outside of Highlight This (eg pastebin) and import them on a frequent bases.
+        
+                </div>
+                <div>
+                    <input type="radio" id="typeLocal" name="type" value="local" checked><label for="typeLocal" id="localLabel">In Highlight This</label><br>
+                    <input type="radio" id="typeRemote" name="type" value="remote"><label for="typeRemote" id="remoteLabel">External</label><br>
+                    <!--input type="radio" id="typeRegex" name="type" value="regex"><label for="typeRegex" id="regexLabel">Regex</label><br-->
+                </div>
+            </div>
+            <div style="text-align:center; margin-top: 20px;">
+                <span id="cancelCreateGroup" class="secondaryLink" style="margin-right: 30px;">Cancel</span>
+                <button id="createGroupLink" class="primaryLink">Next</button>
+            </div>
+        </form>
+
+    </div>
+    <div id="newGroup" style="display:none;">
+        <h2 id="groupFormTitle"></h2>
+
+        <form id="groupForm">
+            <input type="hidden" id="editWordsGroupName">
+            <input type="hidden" id="field_listType">
+            <input type="hidden" id="field_storage">
+            <div>
+                <!--div id="deleteButton" class="deleteButton">
+                    <span id="deleteGroupLink"  style="text-align: right; margin-right:5px;">Delete word list</span>
+                    <i class="fa fa-trash"></i>
+                </div-->
+            </div>
+            <div class="fieldRow">
+                <div class="fieldLabel" id="field_listname">List name:</div>
+                <input id="group">
+            </div>
+
+            <div class="tab">
+                <span class="general tablinks active" id="tabGeneral">General</span>
+                <span class="general tablinks" id="tabStyleScreen">Style</span>
+                <span class="general tablinks" id="tabLimitations">Limitations</span>
+                <span class="general tablinks" id="tabAction">Action</span>
+                <span class="general tablinks" id="tabAdvanced">Advanced <i id="advancedInfoIcon" class="fa fa-info-circle"></i></span>
+
+            </div>
+            <span id="firstScreen" class="general tabcontent">
+
+                
+
+                <div class="fieldRow" id="extSource">
+                      <div class="fieldLabel" id="field_source">Source:</div>
+                      <div id="remotelist_help" class="inline-help">The remote source needs to return a text file where words are on individual lines, similar to how you would create a local list.</div>
+                        <table class="remoteConfigTable">
+                            <tr>
+                                <td>
+                                        <select id="field_remoteType">
+                                                <option value="web">Web</option>
+                                                <option value="pastebin">Pastebin</option>
+                                                <option value="googleSheets">Google Sheets</option>
+                                        </select>
+                                </td>
+                                <td style="border-left: 1px solid #555;padding-left: 5px;">
+                                        <div id="remoteSourceAttributes">
+                                                <div id="pastbinAttributes">
+                                                    <span>Pastebin id:</span>
+                                                    <input id="pastebinId">
+
+                                                </div>
+                                                <div id="webAttributes">
+                                                    <span>URL:</span>
+                                                    <input id="remoteWebUrl" size="50">
+                                                </div>
+                                                <div id="googleSheetsAttributes">
+                                                    <div style="margin-bottom: 7px;">
+                                                        <button id="launchGoogleSheetsAssisantbtn">Launch the assistant</button>
+                                                        <button id="closeGoogleSheetsAssisantbtn" style="display: none;">Close the assistant</button>
+                                                    </div>
+                                                    <span id="googleSheetsIdContainer">
+                                                        <span id="labelSheetsId">Sheets id:</span>
+                                                        <input id="googleSheetsId">
+                                                    </span>
+                                                </div>
+
+                                        </div>
+
+                                </td>
+                            </tr>
+                           
+                            <tr id="syncRow"> 
+                                <td colspan="2">
+                                    <div class="fieldRow">
+                                        
+                                    </div>
+                                    <div class="fieldRow">
+                                        <button id="syncLink"><i class="fas fa-sync"></i> <span id="syncLinkText">sync</span></button>
+                                        <span id="last_synced_on">Last synced on:</span>
+                                        <span id="syncStatusLastUpdated"></span>
+                                        <span id="syncStatusMessage" style="display: none;">sync status</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                </div>
+                <div class="fieldRow" id="regexSection">
+                    <div id="regexSource">
+                        <div class="fieldLabel">Regex:</div>
+                        <textarea id="regex" style="width:100%; height:120px"></textarea>
+                    </div>
+                </div>
+                <div id="googleSheetsAssistant">
+                    <h2 id="googleSheetsAssistantTitle" style="margin-top: 0;">Google Sheets assistant</h2>
+                    <ol>
+                        <li><span id="googleAssist1">Make or open an existing a Google Sheets document.</span></li>
+                        <li><span id="googleAssist2">In the first sheet, first column create your list of words.</span></li>
+                        <li><span id="googleAssist3">Publish your sheet on the web</span><img src="images/GoogleAssistant1.png" style="height: 85px;"></li>
+                        <li><span id="googleAssist4">Share the Google sheets</span><img src="images/GoogleAssistant2.png" style="height: 85px;"></li>
+                        <li><span id="googleAssist5">Select the link from "Copy Link"</span></li>
+                        <li>
+                            <span id="googleAssist6">Paste the link here</span>
+                            <input id="googleAssistLink">
+                            <button id="googleAssistOKbtn">ok</button>
+                            <div id="googleAssistInfo"></div>
+                        </li>
+
+                    </ol>
+                </div>
+                <div class="fieldRow" id="wordsSection">
+                    <div><span class="fieldLabel" id="field_words">Words: </span></div>
+                    
+                    <div id="field_words_help" class="inline-help">You can use * and ? wildcards, each new line is considered as a word</div>
+
+                    <!--textarea id="words" style="width:100%; height:250px"></textarea-->
+
+                    <table style="width: 100%; border-spacing: 0; height: 30px;">
+                        <tr style="vertical-align: middle;">
+                            <td>
+                                <button id="wordsSelectBtn"><i id="WordsSelectIcon" class="far fa-check-square"></i></button>
+                                <button id="wordsDelete"><i class="fa fa-trash"></i></button>
+                                <div id="wordsMoveContainer">
+                                    <button id="wordsMove"><i class="fas fa-external-link-alt"></i></button>
+                                    <div id="wordsMoveMenu">
+                                        <div id="wordsMoveMenuTitle">Move to:</div>
+                                        <ul id="wordsMoveMenuList">
+   
+                                        </ul>
+                                    </div>
+
+                                </div>
+                                <button id="wordsSortAsc" style="margin-left: 7px;"><i class="fas fa-sort-alpha-down"></i></button>
+                                <button id="wordsSortDesc"><i class="fas fa-sort-alpha-up"></i></button>
+
+                            </td>
+                            <td style="text-align: right;">
+                                <input id="filterwordlist" placeholder="Filter">
+                                <i id="filterwordlistsubmit" class="fa fa-search"></i>
+                            </td>
+                        </tr>
+
+                    </table>
+                    <div style="text-align:right; margin-right:5px;">
+                       
+
+
+                    </div>
+                    <div id="words" style="height:250px" contenteditable="true" spellcheck="false" ondrop="return false;"></div>
+                </div>
+
+                <div id="findWordsSection" class="fieldRow" style="line-height: 23px;">
+                  
+
+                    <input id="findwords" type="checkbox" checked><label for="findwords" id="field_detection_help">Only detect complete words</label>
+            
+                    <div id="hintNonUnicode" class="hint" style="display:none"><i class="fa fa-info-circle"></i> <span id="non_unicode_chars">you have added non unicode words to your list of words, uncheck the complete words detection to highlight them properly</span></div>
+                </div>
+            </span>
+            <span id="styleScreen" style="display:none;" class="general tabcontent">
+                <div class="fieldRow">
+                    <div class="fieldLabel" id="field_colors">Colors:</div>
+                    <div id="field_colors_help" class="inline-help" >Select colors or type an html color code e.g. "#ccc" or "green"</div>
+
+                    <table class="colorTable">
+                        <tr>
+                            <td id="field_foreground">Foreground:</td>
+                            <td id="groupFColorSelector"></td>
+                            <td id="groupFColorSelectorInput"></td>
+
+                        </tr>
+                        <tr>
+                            <td id="field_background">Background:</td>
+                            <td id="groupColorSelector"></td>
+                            <td id="groupColorSelectorInput"></td>
+                        </tr>
+                    </table>
+                    <!--input type="checkbox" id="onlyColorBorder" name="onlyColorBorder"><label for="onlyColorBorder">Only show a border</label>
+                    <input type="checkbox" id="noShadowBox" name="noShadowBox"><label for="noShadowBox">Do not show shadowbox</label-->
+
+                </div>
+                <!--div class="fieldRow">
+                    <input type="checkbox" id="italic" name="italic"><label for="italic">Italic</label>
+                    <input type="checkbox" id="underline" name="underline"><label for="underline">Underline</label>
+                    <input type="checkbox" id="bold" name="bold"><label for="bold">Bold</label>
+                </div-->
+                <div id="highlightExample">
+                    <span id="example1">This is an</span>
+                    <span id="example">example</span>
+                    <span id="example2">of highlighted text</span>
+                </div>
+            </span>
+            <span id="secondScreen" style="display:none;" class="general tabcontent">
+                <div id="sites_info" class="inline-help">List the sites on which you want highlights to occur. You can define a white- and a blacklist. Blacklist has priority.
+                    If nothing is defined, highlights are set on all pages. You can use wildcards such as * and ?.
+                    <br /> examples: *.google.com, www.google.com, www.google.com/something/page.html, www.go?gle.com/*/page.html
+                </div>
+                <div class="fieldLabel" id="field_highlightOn">Highlight on</div>
+
+                <textarea id="highlightOnSites" style="width:100%; height:120px"></textarea>
+
+                <div class="fieldLabel" id="field_dontHighlight">Don't Highlight on:</div>
+
+                <textarea id="dontHighlightOnSites" style="width:100%; height:120px"></textarea>
+            </span>
+
+            <span id="actionScreen" style="display: none" class="general tabcontent">
+                
+                <div class="fieldRow" id="action_intro">
+                    Define the action to execute when clicking on a highlight
+                </div>
+               
+                <span id="actionDetails">
+                    <table style="width:100%;">
+                        <tr>
+                            <td id="label_action">Action:</td>
+                            <td>
+                                <select id="action">
+                                    <option value="0" id="action_none">None</option>
+                                    <option value="1" id="action_newtab">Open in new tab</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr id="action1Attributes">
+                            <td id="label_link">Link:</td>
+                            <td>
+                                <input id="actionLink" type="text" style="width:100%">
+                                <div id="actionLinkValidation" style="display: none;"  class="statusError"></div>
+                            </td>
+                        </tr>
+                        </tr>
+                    </table>
+                    <span id="action1Info">
+                        <div class="actionExample" id="actionExample">
+                            <p id="actionExampleHelp">Example, a highlight of the word "highlight" by using the token "Hi?hL*", will result in:</p>
+                            <p id="actionExampleUrl">http://wikipedia.com/highlight</p>
+                        </div>
+                        <div>
+                            <ul class="actiontips">
+                                <li id="action_tip1"><strong>%t%</strong> gets replaced by the text found on the page (eg Highlight) </li>
+                                <li id="action_tip2"><strong>%s%</strong> gets replaced by your search word (eg Hi?hL*)</li>
+                                <li id="action_tip3"><strong>%tu%</strong> or <strong>%tl%</strong>, <strong>%su%</strong> or <strong>%sl%</strong> forces in uppercase or lowercase</li>
+                                <li id="action_tip4" style="margin-top:10px;">Some examples: https://wikipedia.com/%t% , https://google.com/search?q=%t%</li>
+                            </ul>
+                            
+                        </div>
+                    </span>
+                </span>
+            </span>
+
+            <span id="thirdScreen" style="display: none" class="general tabcontent">
+                
+                <div>
+                    
+                    <div class="fieldRow">
+                        <input id="showInEditableFields" type="checkbox" checked><label for="showInEditableFields" id="field_showInEditableFields_help">Highlight in editable fields</label>
+                    </div>
+                    <div class="fieldRow">
+
+                        <input id="notifyOnHighlight" type="checkbox" checked><label for="notifyOnHighlight" id="field_notifyOnHighlight_help">Notify when a word is found</label>
+                        <select id="notifyFrequency"><option value="1" id="notifyFrequency_1">Once per page</option><option value="2" id="notifyFrequency_2">Every time</option></select>
+                    </div>
+                    <div class="fieldRow">
+                        <input id="useRegexTokens" type="checkbox"><label for="useRegexTokens" id="field_useRegexTokens_help">Use Regex tokens instead of simple * and ? wildcards</label>
+                    </div>
+                    <div class="fieldRow">
+                        <input id="caseSensitive" type="checkbox"><label for="caseSensitive" id="field_caseSensitive_label">Compare with case sensitive</label>
+                    </div>
+                    <div class="fieldRow" id="syncFrequencySetting">
+                        
+                            <label for="syncFrequency" id="syncFrequencyLabel">Download frequency:</label>
+                        
+                    
+                            <select id="syncFrequency" name="syncFrequency">
+                                <option value='10'>Every 10 mins</option>
+                                <option value='30'>Every 30 mins</option>
+                                <option value='60'>Every hour</option>
+                                <option value='240'>Every 4 hours</option>
+                                <option value='480' selected>Every 8 hours</option>
+                                <option value='1440'>Every day</option>
+                            </select>
+                    </div>
+                    <div id="migrateSuggestion" class="fieldRow" style="border-top: 1px solid #eee;padding-top: 5px;padding-bottom: 20px;">
+                        <table>
+                            <tr>
+                                <td>
+                                    <span id="migrateSuggestionText">Change this list to a synchronised list, to make it available on all your browsers where you are logged in</span>
+                                </td>
+                                <td style="text-align: right;
+                                white-space: nowrap;"> 
+                                    <button id="migrateSuggestionButton" type="submit" class="secondaryButton">Synchronize list</button>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        
+                    </div>
+                </div>
+            </span>
+            <div class="generalButtons">
+                <div id="validationErrors"></div>
+                <span id="cancelAddGroup" class="secondaryLink" style="margin-right: 30px;">Cancel</span>
+                <button id="formSubmitButton" type="submit" class="primaryLink">Add</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div id="settingsGroup" style="display:none;">
+
+        <h2 id="popup_settings">Settings</h2>
+        <div style="position: absolute;top: 55px;">
+            <span id="backFromSettings" class="secondaryLink">< Back</span>
+        </div>
+        <div class="tab">
+            <span class="settings tablinks active" id="tabSettingsGeneral">General</span>
+            <span class="settings tablinks" id="tabSettingsBackup">Backup</span>
+        </div>
+        <span id="settingsGeneral" class="settings tabcontent">
+            <div style="margin:10px;">
+                <form>
+                    <div>
+                        <input type="checkbox" id="showFoundWords"><label for="showFoundWords"  id="field_showFoundWords">Show found words:</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="printHighlights"><label id="field_printHighlights">Print highlights:</label>
+                    </div>
+
+                    <div class="fieldLabel" id="field_neverHighlightOn">Never highlight on:</div>
+                    <div>
+                        <div id="field_neverHighlightOn_help" class="inline-help">
+                            <br />List the sites on which you never want highlights to occur. You can use wildcards such as * and ?.
+                            <br /> examples: *.google.com, www.google.com, www.google.com/something/page.html
+                        </div>
+                        <textarea id="neverHighlightOn" style="width:100%; height:150px"></textarea>
+
+                    </div>
+                   
+                    <div class="fieldRow">
+                        <div class="fieldLabel" id="field_performance" >Performance</div>
+                        <div class="inline-help" id="performanceHelp">
+                            Define how much impact Highlight This is allowed to have on your device resources (processing power).
+                        </div>
+                        <div>
+                            <input type="range" id="performance" list="perfticks" style="width: 100%" min="0" max="3">
+    
+                            <datalist id="perfticks">
+                                <option value="0" label="High">
+                                <option value="1">
+                                <option value="2">
+                                <option value="3">
+                            </datalist>
+                        </div>
+                        <div id="perfomanceDescription">High performance machine, the highlighter will refresh the page fast</div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="generalButtons" >
+                <span id="cancelSettings" class="secondaryLink" style="margin-right: 30px;">Cancel</span>
+                <button id="saveSettings" class="primaryLink">Save</button>
+            </div>
+        </span>
+        <span id="settingsBackup" style="display: none" class="settings tabcontent">
+            <div style="margin:10px;">
+                <table>
+                    <tr>
+                        <td style="width:130px" class="fieldLabel" id="field_exportSettings">Export settings:</td>
+                        <td><span id="exportLink" class="SecondaryLink">Export</span><div id="exportLinkDownload"></div></td>
+
+                    </tr>
+
+                    <tr>
+                        <td style="width:130px" class="fieldLabel" id="field_importSettings">Import settings:</td>
+                        <td>
+                            <form id="uploadform">
+                                <input type="file" id="importFile">
+                                
+   
+                            </form>
+
+                        </td>
+                    </tr>
+                </table>
+
+                <div id="hintRestore" class="hint" style="display:none"><i class="fa fa-info-circle"></i> <span id="restoreWarning">restoreWarning</span></div>
+                <span class="primaryLink" id="importFileLink"  style="display:none;">Import</span>
+                <button class="primaryLink" id="importLocalFileLink"  style="display:none;margin-top: 10px;width: 100%;">Import Local</button>
+                <button class="primaryLink" id="importSyncFileLink"  style="display:none;margin-top: 10px;width: 100%;">Import Sync</button>
+                <span id="importFFLink" class="secondaryLink">Import file</span>
+                
+                <span id="importError" style="color:red;"/>
+            </div>
+        </span>
+
+
+    </div>
+
+    <div id="donate" style="display:none;">
+        <div class="devpicture"></div>
+        <p><span id="donate1">Hi</span></p>
+        <p><span id="donate2">I'm  </span></p>
+        <p><span id="donate3">Highlight </span></p>
+        <button id="donatebtn" class="donatebtn">Doe</button>
+
+        <p><a id="dontdonate" class="dontdonatelink">I don</a></p>
+    </div>
+    <div id="deleteGroup" style="display:none;font-size: 16px;
+                               text-align: center;
+                               margin-top: 50%">
+        <span id="popup_confirmDelete">Are you sure you want to delete the word list and its words?</span>
+        <div>
+            <span id="labelListName">List name</span> : <span id="deleteGroupName"/>
+        </div>
+        <div style="margin-top:30px">
+            <span id="yesDeleteGroup" class="secondaryLink" style="margin-right: 30px;">Yes</span>
+            <button id="noDeleteGroup" class="primaryLink">No</button>
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>

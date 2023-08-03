@@ -1,0 +1,28 @@
+<html>
+<head>
+    <script src="common.js"></script>
+    <script src="import.js"></script>
+
+    <script src="libs/purify/purify.js"></script>
+    <script src="libs/invertColor/invertColor.js"></script>
+    <script src="libs/jscolor/jscolor.js"></script>
+
+    <link rel="stylesheet" href="application.css" type="text/css">
+    <link rel="stylesheet" href="/libs/font-awesome/css/all.css">
+</head>
+<body style="padding-bottom: 15px;">
+
+    <h1>Import settings</h1>
+
+    <form id="uploadform">
+        <input type="file" id="importFile">
+        <div id="hintRestore" class="hint" style="display:none"><i class="fa fa-info-circle"></i> <span id="restoreWarning">restoreWarning</span></div>
+
+        <span class="primaryLink" id="importLocalFileLink"  style="display:none;margin: 5px;">Import Local</span>
+        <span class="primaryLink" id="importSyncFileLink"  style="display:none;margin: 5px;">Import Sync</span>
+    </form>
+
+    <span id="importError" style="color:red;"></span>
+    <span id="importDone" style="display: none;">Import finished.... window closing in 3 seconds</span>
+</body>
+</html>
